@@ -17,29 +17,55 @@ import android.content.SharedPreferences;
 
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
-
+import android.view.View.OnClickListener;
 
 public class MainActivity extends AppCompatActivity {
+
     private Button buttonStart, buttonStop, buttonRestart;
     private TextView textInfoService, textInfoSettings;
     private String message;
     private Boolean show_time, work, work_double;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         buttonStart = (Button)findViewById(R.id.buttonStart);
         buttonStop = (Button)findViewById(R.id.buttonStop);
         buttonRestart = (Button)findViewById(R.id.buttonRestart);
         textInfoService = (TextView)findViewById(R.id.textInfoServiceState);
         textInfoSettings = (TextView) findViewById(R.id.textInfoSettings);
-        super.onCreate(savedInstanceState);
-        updateUI();
-        setContentView(R.layout.activity_main);
-    }
 
+        Button buttonStart = (Button) findViewById(R.id.buttonStart);
+        buttonStart.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                clickStart(v);
+            }
+        });
+
+        Button buttonStop = (Button) findViewById(R.id.buttonStop);
+        buttonStop.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                clickStop(v);
+            }
+        });
+
+        Button buttonReset = (Button) findViewById(R.id.buttonRestart);
+        buttonReset.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                clickRestart(v);
+            }
+        });
+        updateUI();
+
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu,menu);
+        return true;
+    }
     private void updateUI(){
+
         if(isMyForegroundServiceRunning()){
             buttonStart.setEnabled(false);
             buttonStop.setEnabled(true);
@@ -52,48 +78,8 @@ public class MainActivity extends AppCompatActivity {
             buttonRestart.setEnabled(false);
             textInfoService.setText(getString(R.string.info_service_not_running));
         }
+
         textInfoSettings.setText(getPreferences());
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu,menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.itemSettings: startActivity(new Intent(this,SettingsActivity.class)); return true;
-            case R.id.itemExit: finishAndRemoveTask(); return true;
-            default: return super.onOptionsItemSelected(item);
-        }
-    }
-
-    public void clickStart(View view) {
-
-        getPreferences();
-
-        Intent startIntent = new Intent(this,MyForegroundService.class);
-        startIntent.putExtra(MyForegroundService.MESSAGE,message);
-        startIntent.putExtra(MyForegroundService.TIME,show_time);
-        startIntent.putExtra(MyForegroundService.WORK,work);
-        startIntent.putExtra(MyForegroundService.WORK_DOUBLE,work_double);
-
-
-        ContextCompat.startForegroundService(this, startIntent);
-        updateUI();
-    }
-    public void clickStop(View view) {
-
-        Intent stopIntent = new Intent(this, MyForegroundService.class);
-        stopService(stopIntent);
-        updateUI();
-
-    }
-    public void clickRestart(View view) {
-        clickStop(view);
-        clickStart(view);
     }
     private String getPreferences(){
 
@@ -108,7 +94,41 @@ public class MainActivity extends AppCompatActivity {
                 +"work: " + work.toString() + "\n"
                 +"double: " + work_double.toString();
     }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.itemSettings: startActivity(new Intent(this,SettingsActivity.class)); return true;
+            case R.id.itemExit: finishAndRemoveTask(); return true;
+            default: return super.onOptionsItemSelected(item);
+        }
+    }
+    public void clickStart(View view) {
 
+        getPreferences();
+
+        Intent startIntent = new Intent(this,MyForegroundService.class);
+        startIntent.putExtra(MyForegroundService.MESSAGE,message);
+        startIntent.putExtra(MyForegroundService.TIME,show_time);
+        startIntent.putExtra(MyForegroundService.WORK,work);
+        startIntent.putExtra(MyForegroundService.WORK_DOUBLE,work_double);
+
+
+        ContextCompat.startForegroundService(this, startIntent);
+        updateUI();
+    }
+
+    public void clickStop(View view) {
+
+        Intent stopIntent = new Intent(this, MyForegroundService.class);
+        stopService(stopIntent);
+        updateUI();
+
+    }
+
+    public void clickRestart(View view) {
+        clickStop(view);
+        clickStart(view);
+    }
 
     @SuppressWarnings("deprecation")
     private boolean isMyForegroundServiceRunning(){
@@ -124,5 +144,4 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
-
 }

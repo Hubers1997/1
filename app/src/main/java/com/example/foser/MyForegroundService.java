@@ -29,6 +29,16 @@ public class MyForegroundService extends Service {
     private String message;
     private Boolean show_time, do_work, double_speed;
 
+    private void doWork() {
+
+        String info = "Start working..."
+                +"\n show_time=" + show_time.toString()
+                +"\n do_work=" + do_work.toString()
+                +"\n double_speed=" + double_speed.toString();
+
+        Toast.makeText(this, info , Toast.LENGTH_LONG).show();
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -83,13 +93,5 @@ public class MyForegroundService extends Service {
         NotificationManager manager = getSystemService(NotificationManager.class);
         manager.createNotificationChannel(serviceChannel);
     }
-    private void doWork() {
 
-        String info = "Start working..."
-                +"\n show_time=" + show_time.toString()
-                +"\n do_work=" + do_work.toString()
-                +"\n double_speed=" + double_speed.toString();
-
-        Toast.makeText(this, info , Toast.LENGTH_LONG).show();
-    }
 }
